@@ -1,0 +1,252 @@
+o<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IBM NLG Content Creator</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: #e0eafc;
+  overflow-y: auto;  /* ✅ Enables vertical scrolling */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* So content grows downward */
+  padding: 40px 15px;
+  min-height: 100vh;
+}
+
+
+    
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.4;
+      z-index: 0;
+      animation: floatBlob 20s infinite alternate ease-in-out;
+    }
+
+    .blob:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      background: #0f62fe;
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .blob:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      background: #0043ce;
+      bottom: -120px;
+      right: -150px;
+      animation-delay: 5s;
+    }
+
+    @keyframes floatBlob {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(30px, -40px); }
+    }
+
+    /* IBM Logo */
+    .logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
+
+    .logo img {
+      height: 40px;
+      width: auto;
+      opacity: 0.9;
+    }
+
+  .container {
+  width: 100%;
+  max-width: 720px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  overflow-wrap: break-word;
+}
+
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 30px;
+      color: #0f62fe;
+    }
+
+    header p {
+      font-size: 15px;
+      color: #555;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
+      color: #333;
+    }
+
+    input, button, textarea {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      transition: 0.3s ease;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #0f62fe;
+      outline: none;
+    }
+
+    button {
+      background-color: #0f62fe;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transform: scale(1);
+    }
+
+    button:hover {
+      background-color: #0043ce;
+      transform: scale(1.05);
+      box-shadow: 0 6px 15px rgba(15, 98, 254, 0.3);
+    }
+
+    textarea {
+      height: 200px;
+      resize: vertical;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 14px;
+      color: #777;
+      z-index: 1;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 24px;
+      }
+
+      .logo img {
+        height: 32px;
+      }
+
+      textarea {
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <a href="https://www.ibm.com" target="_blank" rel="noopener noreferrer">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM Logo">
+    </a>
+  </div>
+
+  <div class="blob"></div>
+  <div class="blob"></div>
+
+  <div class="container">
+    <header>
+      <h1>IBM NLG Content Creator</h1>
+      <p>Your smart assistant for generating topic-based content</p>
+    </header>
+
+    <label for="topicInput">Enter a Topic or Keyword:</label>
+    <input type="text" id="topicInput" placeholder="e.g., Future of AI in Healthcare" />
+
+    <button onclick="generateContent()">Generate Content</button>
+
+    <label for="outputBox">Generated Content:</label>
+    <textarea id="outputBox" placeholder="Your AI-generated content will appear here..." readonly></textarea>
+  </div>
+
+  <div class="footer">
+    &copy; 2025 IBM Summer Internship Project – Natural Language Generation for content creation
+  </div>
+
+ <script>
+  
+   async function generateContent() {
+  const topic = document.getElementById("topicInput").value.trim();
+  const output = document.getElementById("outputBox");
+
+  const oldImg = document.querySelector("#outputBox + img");
+  if (oldImg) oldImg.remove();
+
+  if (topic === "") {
+    output.value = "⚠️ Please enter a valid topic to generate content.";
+    return;
+  }
+
+  output.value = "⏳ Generating summary... Please wait.";
+
+  try {
+    const response = await fetch("http://127.0.0.1:5000/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ topic: topic })
+    });
+
+    const data = await response.json();
+
+    if (data.summary) {
+      output.value = `✅ Topic: ${topic}\n\n${data.summary}`;
+
+      if (data.image_url) {
+        const imgElement = document.createElement("img");
+        imgElement.src = data.image_url;
+        imgElement.alt = "Best match image";
+        imgElement.style.maxWidth = "100%";
+        imgElement.style.marginTop = "20px";
+
+        output.parentNode.appendChild(imgElement);
+      }
+    } else {
+      output.value = "⚠️ No summary generated.";
+    }
+  } catch (error) {
+    output.value = "❌ Error connecting to server. Is it running?";
+    console.error(error);
+  }
+}
+
+      
+</script>
+
+
+
+</body>
+</html>
