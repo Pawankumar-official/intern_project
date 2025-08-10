@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-#abhinav
+
 @app.route('/')
 def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
