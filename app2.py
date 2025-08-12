@@ -77,7 +77,7 @@ def generate_summary():
             "similarity": similarities[top_idx],
             "image_url": None
         })
-#label file
+
 
 if __name__ == '__main__':
     app.run(debug=True)
