@@ -4,10 +4,6 @@ from backend_module import generate_combined_summary, summarize_text, rank_docum
 import os
 #comment
 
-#comment
-
-
-
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
